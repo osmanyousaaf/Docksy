@@ -66,4 +66,4 @@ claude --plugin-dir ./plugin      # load the plugin from a checkout
 claude plugin validate ./plugin   # validate the manifest, skills, hooks and MCP config
 ```
 
-Full docs: <https://osmanyousaaf.github.io/docksy/claude.html>. License: Apache-2.0.
+Full docs: <https://osmanyousaaf.github.io/Docksy/claude.html>. License: Apache-2.0.

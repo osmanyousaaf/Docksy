@@ -23,13 +23,14 @@ const server: Server = {
   diskTotal: 160 * 1024 ** 3, createdAt: now, updatedAt: now,
 };
 const point = (cpu: number): MetricPoint => ({
-  ts: now, cpu, load1: 0.5, memUsed: 6 * 1024 ** 3, memTotal: 8 * 1024 ** 3, swapUsed: 0,
+  ts: now, cpu, load1: 0.5, load5: 0.4, load15: 0.3, memUsed: 6 * 1024 ** 3, memTotal: 8 * 1024 ** 3, swapUsed: 0,
   diskUsed: 40 * 1024 ** 3, diskTotal: 160 * 1024 ** 3, netRx: 1200, netTx: 300,
 });
 const app: App = {
   id: 'app_1', name: 'blog', serverId: 'srv_1', kind: 'app', template: null, sourceType: 'git', repoUrl: 'https://github.com/me/blog',
   branch: 'main', hasGitToken: false, image: null, buildType: 'auto', dockerfilePath: 'Dockerfile', buildContext: '.',
   composePath: 'docker-compose.yml', port: 3000, domains: ['blog.example.com'], healthcheckPath: null, volumes: [],
+  description: null, startCommand: null, watchPaths: [], cpuLimit: null, memLimitMb: null, suggestedDomain: 'blog.203.0.113.10.sslip.io',
   status: 'running', autoDeploy: true, webhookUrl: 'https://d/api/v1/webhooks/github/app_1', currentDeploymentId: 'dep_3',
   createdAt: now, updatedAt: now,
 };

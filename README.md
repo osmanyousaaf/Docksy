@@ -10,15 +10,15 @@
   <img alt="Free forever" src="https://img.shields.io/badge/free-forever-34d399?style=flat-square">
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-38bdf8?style=flat-square"></a>
   <img alt="No telemetry" src="https://img.shields.io/badge/telemetry-none-a78bfa?style=flat-square">
-  <a href="https://osmanyousaaf.github.io/docksy/claude.html"><img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-a78bfa?style=flat-square"></a>
+  <a href="https://osmanyousaaf.github.io/Docksy/claude.html"><img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-a78bfa?style=flat-square"></a>
   <a href="https://github.com/sponsors/osmanyousaaf"><img alt="Sponsor" src="https://img.shields.io/badge/sponsor-%E2%99%A5-f472b6?style=flat-square"></a>
 </p>
 
 <p align="center">
-  <a href="https://osmanyousaaf.github.io/docksy/">Website</a> ·
-  <a href="https://osmanyousaaf.github.io/docksy/install.html">Install</a> ·
-  <a href="https://osmanyousaaf.github.io/docksy/claude.html">Claude &amp; MCP</a> ·
-  <a href="https://osmanyousaaf.github.io/docksy/faq.html">FAQ</a>
+  <a href="https://osmanyousaaf.github.io/Docksy/">Website</a> ·
+  <a href="https://osmanyousaaf.github.io/Docksy/install.html">Install</a> ·
+  <a href="https://osmanyousaaf.github.io/Docksy/claude.html">Claude &amp; MCP</a> ·
+  <a href="https://osmanyousaaf.github.io/Docksy/faq.html">FAQ</a>
 </p>
 
 ---
@@ -48,7 +48,7 @@ The installer:
 
 Open `http://<server-ip>:8080`, create the owner account, and deploy. It's idempotent (re-run it to update) and supports `--uninstall`.
 
-Prefer Docker Compose? See [the install docs](https://osmanyousaaf.github.io/docksy/install.html#compose).
+Prefer Docker Compose? See [the install docs](https://osmanyousaaf.github.io/Docksy/install.html#compose).
 
 ## Use it with Claude
 
@@ -87,7 +87,7 @@ Want only the MCP server?
 claude mcp add docksy --env DOCKSY_URL=https://docksy.example.com --env DOCKSY_TOKEN=dsk_... -- npx -y @crovenai/docksy-mcp
 ```
 
-Full tool reference: [Claude & MCP docs](https://osmanyousaaf.github.io/docksy/claude.html).
+Full tool reference: [Claude & MCP docs](https://osmanyousaaf.github.io/Docksy/claude.html).
 
 ## CLI
 
@@ -103,7 +103,7 @@ docksy diagnose api           # deterministic health report
 docksy rollback api           # back to the previous good deploy
 ```
 
-Every read command supports `--json`. See the [CLI docs](https://osmanyousaaf.github.io/docksy/cli.html).
+Every read command supports `--json`. See the [CLI docs](https://osmanyousaaf.github.io/Docksy/cli.html).
 
 ## Docksy vs Coolify
 

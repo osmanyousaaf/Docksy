@@ -12,7 +12,7 @@
       "description": "Deploy, monitor, diagnose and fix your Docksy servers and apps from Claude Code: MCP server, skills, slash commands, an SRE agent and a safety hook.",
       "category": "devops",
       "tags": ["paas", "self-hosted", "deploy", "docker", "monitoring", "sre", "mcp"],
-      "homepage": "https://osmanyousaaf.github.io/docksy/claude.html",
+      "homepage": "https://osmanyousaaf.github.io/Docksy/claude.html",
       "repository": "https://github.com/osmanyousaaf/docksy",
       "license": "Apache-2.0"
     }

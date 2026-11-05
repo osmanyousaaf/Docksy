@@ -7,7 +7,7 @@
     "name": "Crovenai",
     "url": "https://github.com/crovenai"
   },
-  "homepage": "https://osmanyousaaf.github.io/docksy/claude.html",
+  "homepage": "https://osmanyousaaf.github.io/Docksy/claude.html",
   "repository": "https://github.com/osmanyousaaf/docksy",
   "license": "Apache-2.0",
   "keywords": [
@@ -22,6 +22,6 @@
     "devops"
   ],
   "icon": "./assets/icon.png",
-  "documentationUrl": "https://osmanyousaaf.github.io/docksy/claude.html",
+  "documentationUrl": "https://osmanyousaaf.github.io/Docksy/claude.html",
   "supportUrl": "https://github.com/osmanyousaaf/docksy/issues"
 }
