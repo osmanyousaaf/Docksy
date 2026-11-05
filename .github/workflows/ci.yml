@@ -25,6 +25,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - name: Build client (the CLI and MCP typecheck against its dist/ types)
+        run: npm run build -w @crovenai/docksy-client
       - name: Typecheck
         run: npm run typecheck
       - name: Test
