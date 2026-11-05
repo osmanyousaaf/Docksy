@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install · Docksy</title>
+<meta name="description" content="Install Docksy on any Linux server in about two minutes.">
+<meta property="og:title" content="Install · Docksy">
+<meta property="og:description" content="Install Docksy on any Linux server in about two minutes.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html" class="active">Docs</a>
+    <a href="claude.html">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<div class="layout">
+<aside class="sidebar"><h4>Get started</h4><ul><li><a href="install.html" class="active">Install</a></li><li><a href="servers.html">Servers</a></li></ul><h4>Use Docksy</h4><ul><li><a href="apps.html">Apps &amp; deploys</a></li><li><a href="monitoring.html">Monitoring &amp; alerts</a></li><li><a href="backups.html">Backups</a></li></ul><h4>Claude</h4><ul><li><a href="claude.html">Claude &amp; MCP</a></li><li><a href="cli.html">CLI</a></li></ul><h4>Reference</h4><ul><li><a href="self-hosting.html">Self-hosting &amp; security</a></li><li><a href="faq.html">FAQ</a></li></ul></aside>
+<main class="content">
+<h1>Install</h1>
+<p class="lead">Docksy runs as a single container on any Linux box with Docker. The installer takes about two minutes.</p>
+
+<h2 id="requirements">Requirements</h2>
+<ul>
+  <li>A Linux server for the control plane: Ubuntu 22.04/24.04 or Debian 12, with 1 vCPU and 1 GB RAM minimum. It can be the same machine you deploy apps to.</li>
+  <li>Root or sudo access.</li>
+  <li>Ports <code>8080</code> (dashboard), and <code>80</code>/<code>443</code> if this host will also run apps.</li>
+</ul>
+
+<h2 id="one-line">One-line install</h2>
+<pre><span class="p">$ </span>curl -fsSL https://raw.githubusercontent.com/osmanyousaaf/docksy/main/install.sh | sudo bash</pre>
+<p>The installer is idempotent, so it's safe to run again to update or repair. It:</p>
+<ol>
+  <li>installs Docker if it's missing</li>
+  <li>generates a random <code>DOCKSY_SECRET</code>, the master key that encrypts SSH keys, tokens and env vars at rest</li>
+  <li>writes <code>/opt/docksy/.env</code> and <code>/opt/docksy/docker-compose.yml</code></li>
+  <li>starts Docksy (<code>ghcr.io/osmanyousaaf/docksy</code>)</li>
+  <li>registers the host itself as the server <strong>localhost</strong>, by adding Docksy's public key to root's <code>authorized_keys</code></li>
+  <li>prints the URL to open</li>
+</ol>
+<div class="callout warn"><p><strong>Read before you pipe.</strong> It's a good habit to read <a href="https://github.com/osmanyousaaf/docksy/blob/main/install.sh">install.sh</a> before you run it. It's short.</p></div>
+
+<h2 id="first-run">First run</h2>
+<ol>
+  <li>Open <code>http://&lt;your-server-ip&gt;:8080</code>.</li>
+  <li>Create the <strong>owner</strong> account. The setup page only works while no users exist.</li>
+  <li>In <strong>Settings → Instance</strong>, set the <strong>Public URL</strong>: the address your servers and GitHub use to reach Docksy (for agents and webhooks).</li>
+  <li>Go to <a href="servers.html">Servers</a> to add a machine, or deploy straight to <em>localhost</em>.</li>
+</ol>
+
+<h2 id="compose">Docker Compose (manual)</h2>
+<p>If you'd rather manage it yourself:</p>
+<pre><span class="c"># /opt/docksy/docker-compose.yml</span>
+services:
+  docksy:
+    image: ghcr.io/osmanyousaaf/docksy:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DOCKSY_SECRET: ${DOCKSY_SECRET}          <span class="c"># 64 hex chars: openssl rand -hex 32</span>
+      DOCKSY_PUBLIC_URL: https://docksy.example.com
+    volumes:
+      - docksy-data:/data
+volumes:
+  docksy-data:</pre>
+<pre><span class="p">$ </span>echo "DOCKSY_SECRET=$(openssl rand -hex 32)" &gt; .env
+<span class="p">$ </span>docker compose up -d</pre>
+
+<h2 id="https">Put the dashboard behind HTTPS</h2>
+<p>Run Docksy behind any reverse proxy (Caddy, nginx, Traefik) on a domain, e.g. <code>docksy.example.com → localhost:8080</code>, and set that URL as the Public URL. Server-sent events are used for live charts and logs, so turn off response buffering if your proxy has it (nginx: <code>proxy_buffering off;</code>).</p>
+
+<h2 id="update">Update</h2>
+<pre><span class="p">$ </span>cd /opt/docksy &amp;&amp; docker compose pull &amp;&amp; docker compose up -d</pre>
+<p>Re-running the installer does the same. Database migrations run automatically on start. Your data lives in the <code>/data</code> volume.</p>
+
+<h2 id="uninstall">Uninstall</h2>
+<pre><span class="p">$ </span>curl -fsSL https://raw.githubusercontent.com/osmanyousaaf/docksy/main/install.sh | sudo bash -s -- --uninstall</pre>
+<p>This stops and removes Docksy. Apps you deployed keep running on their servers, because they're plain Docker containers.</p>
+
+<h2 id="env">Environment variables</h2>
+<table>
+  <tr><th>Variable</th><th>Default</th><th>Purpose</th></tr>
+  <tr><td><code>DOCKSY_SECRET</code></td><td>generated into <code>data/secret.key</code></td><td>32-byte master key (64 hex chars) for encryption at rest</td></tr>
+  <tr><td><code>DOCKSY_DATA_DIR</code></td><td><code>/data</code> in the image</td><td>SQLite database, SSH keys, secret</td></tr>
+  <tr><td><code>DOCKSY_PUBLIC_URL</code></td><td>from Settings</td><td>Overrides the Public URL used by agents and webhooks</td></tr>
+  <tr><td><code>PORT</code> / <code>HOST</code></td><td><code>8080</code> / <code>0.0.0.0</code></td><td>HTTP listener</td></tr>
+  <tr><td><code>DOCKSY_AGENT_INTERVAL</code></td><td><code>10</code></td><td>Seconds between agent metric reports</td></tr>
+</table>
+<nav class="pager"><span></span><a class="next" href="servers.html"><small>Next →</small>Servers</a></nav>
+<p style="margin-top:2rem;font-size:13px;color:var(--muted)"><a href="https://github.com/osmanyousaaf/docksy/edit/main/docs/install.html">Edit this page on GitHub</a></p>
+</main>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

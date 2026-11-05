@@ -1,0 +1,33 @@
+# Keep the build context small and free of secrets/local state.
+.git
+.github
+.claude
+.claude-plugin
+**/node_modules
+**/dist
+**/.vite
+**/coverage
+**/*.log
+**/.DS_Store
+
+# local data, secrets
+data
+apps/server/data
+*.db
+*.db-wal
+*.db-shm
+.env
+.env.*
+!.env.example
+
+# not needed in the image
+agent/bin
+docs
+plugin
+e2e
+scripts
+install.sh
+docker-compose.yml
+Dockerfile
+.dockerignore
+*.md

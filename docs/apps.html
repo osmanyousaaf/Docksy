@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apps &amp; deploys · Docksy</title>
+<meta name="description" content="Zero-downtime deploys from GitHub, images and templates.">
+<meta property="og:title" content="Apps &amp; deploys · Docksy">
+<meta property="og:description" content="Zero-downtime deploys from GitHub, images and templates.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html">Docs</a>
+    <a href="claude.html">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<div class="layout">
+<aside class="sidebar"><h4>Get started</h4><ul><li><a href="install.html">Install</a></li><li><a href="servers.html">Servers</a></li></ul><h4>Use Docksy</h4><ul><li><a href="apps.html" class="active">Apps &amp; deploys</a></li><li><a href="monitoring.html">Monitoring &amp; alerts</a></li><li><a href="backups.html">Backups</a></li></ul><h4>Claude</h4><ul><li><a href="claude.html">Claude &amp; MCP</a></li><li><a href="cli.html">CLI</a></li></ul><h4>Reference</h4><ul><li><a href="self-hosting.html">Self-hosting &amp; security</a></li><li><a href="faq.html">FAQ</a></li></ul></aside>
+<main class="content">
+<h1>Apps &amp; deploys</h1>
+<p class="lead">Deploy from a GitHub repo, a Docker image or a one-click template. Every deploy is zero-downtime, and rollback is one click.</p>
+
+<h2 id="create">Create an app</h2>
+<p><strong>Apps → New app</strong> offers three sources:</p>
+<table>
+  <tr><th>Source</th><th>What you give it</th></tr>
+  <tr><td><strong>GitHub repo</strong></td><td>Repo URL, branch, and an optional token for private repos (stored encrypted)</td></tr>
+  <tr><td><strong>Docker image</strong></td><td>Any image reference, e.g. <code>ghcr.io/acme/api:1.4</code></td></tr>
+  <tr><td><strong>Template</strong></td><td>Postgres, MySQL, MariaDB, Redis, MongoDB, n8n, Uptime Kuma, Plausible, Umami, MinIO, Ghost, WordPress</td></tr>
+</table>
+<p>App names are lowercase slugs (<code>a-z</code>, <code>0-9</code>, <code>-</code>). Everything that takes an app id also accepts its name.</p>
+
+<h2 id="build">Build types</h2>
+<table>
+  <tr><th>Type</th><th>Behavior</th></tr>
+  <tr><td><code>auto</code></td><td>Uses your Dockerfile if there is one. Otherwise it generates one for Node (<code>package.json</code>), Python (<code>requirements.txt</code>/<code>pyproject.toml</code>), Go (<code>go.mod</code>) or static sites (<code>index.html</code>).</td></tr>
+  <tr><td><code>dockerfile</code></td><td><code>docker build -f &lt;dockerfilePath&gt; &lt;buildContext&gt;</code></td></tr>
+  <tr><td><code>compose</code></td><td><code>docker compose -p docksy-&lt;name&gt; up -d --build</code></td></tr>
+  <tr><td><code>image</code></td><td><code>docker pull</code>, then run</td></tr>
+</table>
+<div class="callout ai"><p>No Dockerfile, or a complicated one? Ask Claude: <em>"dockerize this repo for Docksy"</em>. The <code>docksy-dockerize</code> skill writes a multi-stage, non-root Dockerfile and a <code>.dockerignore</code>.</p></div>
+
+<h2 id="pipeline">The deploy pipeline</h2>
+<p>Every step runs on your server over SSH:</p>
+<ol>
+  <li><strong>Clone</strong> with <code>git clone --depth 1 -b &lt;branch&gt;</code>, recording the commit SHA and message.</li>
+  <li><strong>Build</strong> the image and tag it <code>docksy/&lt;app&gt;:&lt;deploy&gt;</code>.</li>
+  <li><strong>Start</strong> the new container next to the old one, on the <code>docksy</code> network, with your env, volumes and <code>--restart unless-stopped</code>.</li>
+  <li><strong>Health check:</strong> it waits for <code>healthcheckPath</code> to answer (via wget/curl inside the container), or for the container to stay running for 5 seconds. The timeout is 120 seconds.</li>
+  <li><strong>Switch:</strong> the old container is removed only once the new one is healthy. If anything fails, the new container is removed and <strong>the old one keeps serving</strong>.</li>
+  <li><strong>Clean up:</strong> old build directories are pruned, and the last 5 images per app are kept for rollback.</li>
+</ol>
+<p>Each app runs one deploy at a time, and up to 3 run in parallel across the instance. Build logs stream live on <code>/deployments/:id</code>.</p>
+
+<h2 id="domains">Domains &amp; HTTPS</h2>
+<ul>
+  <li>Every routed app gets a free default domain: <code>&lt;app&gt;.&lt;server-ip&gt;.sslip.io</code>.</li>
+  <li>For a custom domain, add an <code>A</code> record pointing at the server's IP, then add the domain in the app settings. The first domain is the primary one.</li>
+  <li>TLS certificates are issued and renewed automatically by the Caddy proxy.</li>
+  <li>Set <strong>Port</strong> to the port your app listens on inside the container.</li>
+</ul>
+
+<h2 id="env">Environment variables</h2>
+<p>Env vars are encrypted at rest, masked in the UI and API (reveal on demand), and injected at container start. Changes apply on the next deploy.</p>
+
+<h2 id="auto-deploy">Auto-deploy on push</h2>
+<ol>
+  <li>Open the app → <strong>Settings</strong> and copy the webhook URL and secret.</li>
+  <li>In GitHub: <strong>Repo → Settings → Webhooks → Add webhook</strong>. Use content type <code>application/json</code>, paste the secret, and pick "Just the push event".</li>
+  <li>Docksy verifies <code>X-Hub-Signature-256</code> and deploys pushes to the app's branch when auto-deploy is on.</li>
+</ol>
+
+<h2 id="rollback">Rollback</h2>
+<p>From <strong>Deployments</strong>, pick any previous <em>succeeded</em> deployment that still has its image and click <strong>Rollback</strong>. It goes through the same zero-downtime switch, so no rebuild is needed. From the CLI: <code>docksy rollback &lt;app&gt; [deploymentId]</code>. From Claude: <code>/docksy:rollback &lt;app&gt;</code>.</p>
+
+<h2 id="lifecycle">Restart, stop, start, delete</h2>
+<ul>
+  <li><strong>Restart / Stop / Start</strong> act on the app's running containers.</li>
+  <li><strong>Delete</strong> removes the app's containers (and its compose project). Volumes are kept unless you choose to delete them too.</li>
+</ul>
+
+<h2 id="logs">Logs</h2>
+<p>The app's <strong>Logs</strong> tab streams <code>docker logs -f</code> live. Build logs are kept for each deployment. From a terminal: <code>docksy logs &lt;app&gt; -f</code>.</p>
+<nav class="pager"><a href="servers.html"><small>← Previous</small>Servers</a><a class="next" href="monitoring.html"><small>Next →</small>Monitoring &amp; alerts</a></nav>
+<p style="margin-top:2rem;font-size:13px;color:var(--muted)"><a href="https://github.com/osmanyousaaf/docksy/edit/main/docs/apps.html">Edit this page on GitHub</a></p>
+</main>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

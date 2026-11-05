@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAQ · Docksy</title>
+<meta name="description" content="Frequently asked questions about Docksy.">
+<meta property="og:title" content="FAQ · Docksy">
+<meta property="og:description" content="Frequently asked questions about Docksy.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html">Docs</a>
+    <a href="claude.html">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html" class="active">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<div class="layout">
+<aside class="sidebar"><h4>Get started</h4><ul><li><a href="install.html">Install</a></li><li><a href="servers.html">Servers</a></li></ul><h4>Use Docksy</h4><ul><li><a href="apps.html">Apps &amp; deploys</a></li><li><a href="monitoring.html">Monitoring &amp; alerts</a></li><li><a href="backups.html">Backups</a></li></ul><h4>Claude</h4><ul><li><a href="claude.html">Claude &amp; MCP</a></li><li><a href="cli.html">CLI</a></li></ul><h4>Reference</h4><ul><li><a href="self-hosting.html">Self-hosting &amp; security</a></li><li><a href="faq.html" class="active">FAQ</a></li></ul></aside>
+<main class="content">
+<h1>FAQ</h1>
+<p class="lead">Short answers to the questions people ask most.</p>
+
+<h3 id="free">Is it really free?</h3>
+<p>Yes, free forever. Docksy is Apache-2.0 licensed, with no paid tier, no feature gates, no seat limits and no telemetry. If it saves you money, you can <a href="https://github.com/sponsors/osmanyousaaf">sponsor development</a>.</p>
+
+<h3 id="vs-coolify">How is it different from Coolify?</h3>
+<p>Coolify is an excellent, mature project with far more integrations, and Docksy borrows ideas from it with gratitude. Docksy is narrower and aims to be simpler. Its differences are monitoring and alerting turned on by default (CPU and memory alerts, uptime checks, a status page), backups that are restore-verified, and a Claude-first design with a <code>diagnose</code> tool. See the <a href="index.html#compare">comparison</a>.</p>
+
+<h3 id="ai">Does Docksy send my data to an AI?</h3>
+<p>No. Docksy never calls an LLM. The Claude integration runs on your machine, in your Claude Code or Claude Desktop, and talks to your Docksy with a token you create and can revoke. You can use Docksy without Claude at all.</p>
+
+<h3 id="claude-required">Do I need Claude?</h3>
+<p>No. The dashboard and CLI do everything. Claude is an optional, very capable operator.</p>
+
+<h3 id="os">Which servers are supported?</h3>
+<p>Any modern x86_64 or arm64 Linux with systemd. Ubuntu 22.04/24.04 and Debian 12 are tested. The agent ships for <code>linux-amd64</code> and <code>linux-arm64</code>.</p>
+
+<h3 id="same-server">Can Docksy and my apps share one server?</h3>
+<p>Yes. The installer registers the host as <em>localhost</em>, so you can deploy to it right away. Add more servers later.</p>
+
+<h3 id="downtime">Do deploys cause downtime?</h3>
+<p>No. The new container must be healthy before the old one is removed. If the deploy fails, the old version keeps serving. Set a <code>healthcheckPath</code> for the strongest guarantee.</p>
+
+<h3 id="compose">Can I deploy docker-compose apps?</h3>
+<p>Yes, use the <code>compose</code> build type. Docksy runs <code>docker compose -p docksy-&lt;name&gt; up -d --build</code>.</p>
+
+<h3 id="private-repos">Private GitHub repos?</h3>
+<p>Yes. Add a fine-grained token with read access to the repo. It's stored encrypted.</p>
+
+<h3 id="docksy-down">What happens if the Docksy control plane goes down?</h3>
+<p>Your apps keep running, because they're ordinary Docker containers with <code>--restart unless-stopped</code> behind the proxy on each server. You lose deploys, metrics collection and alerts until it's back. Agents just retry.</p>
+
+<h3 id="resources">How heavy is the agent?</h3>
+<p>Under 15 MB of RAM and under 1% CPU, as a single static binary with no dependencies.</p>
+
+<h3 id="migrate">Can I migrate from Coolify / Heroku / Render?</h3>
+<p>Any app that builds from a Dockerfile, a compose file or a common Node/Python/Go/static layout deploys as is. Move your env vars, point DNS at the new server, and restore your database from a dump. Claude can help with all of it.</p>
+
+<h3 id="contribute">How can I help?</h3>
+<p>Star the repo, report bugs, improve the docs or pick up a <em>good first issue</em>. See <a href="https://github.com/osmanyousaaf/docksy/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+<nav class="pager"><a href="self-hosting.html"><small>← Previous</small>Self-hosting &amp; security</a><span></span></nav>
+<p style="margin-top:2rem;font-size:13px;color:var(--muted)"><a href="https://github.com/osmanyousaaf/docksy/edit/main/docs/faq.html">Edit this page on GitHub</a></p>
+</main>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

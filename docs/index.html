@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docksy: self-hosted PaaS with monitoring and Claude</title>
+<meta name="description" content="Deploy to your own servers. It watches them for you, and Claude can fix them. Free forever, open source, self-hosted.">
+<meta property="og:title" content="Docksy: self-hosted PaaS with monitoring and Claude">
+<meta property="og:description" content="Deploy to your own servers. It watches them for you, and Claude can fix them. Free forever, open source, self-hosted.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html">Docs</a>
+    <a href="claude.html">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<main>
+<section class="hero">
+  <div class="hero-inner">
+    <span class="pill"><span class="dot"></span>Free forever · Open source · Apache-2.0</span>
+    <h1>Deploy to your own servers.<br><span class="grad">It watches them for you, and Claude can fix them.</span></h1>
+    <p class="sub">Docksy is a simple, self-hosted PaaS. You get git-push deploys with zero downtime, monitoring and alerts on by default, backups that are proven to restore, and first-class Claude integration.</p>
+    <div class="cta">
+      <a class="btn primary" href="install.html">Install in 2 minutes →</a>
+      <a class="btn" href="claude.html">Connect Claude</a>
+      <a class="btn" href="https://github.com/osmanyousaaf/docksy">★ Star on GitHub</a>
+    </div>
+    <div class="install-line">
+      <pre><span class="p">$ </span>curl -fsSL https://raw.githubusercontent.com/osmanyousaaf/docksy/main/install.sh | sudo bash</pre>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Three things, done properly</h2>
+  <p class="sub">Docksy is deliberately smaller than other PaaS tools. What it does, it does by default.</p>
+  <div class="grid3">
+    <div class="card">
+      <div class="ico">📈</div>
+      <h3>Monitoring on by default</h3>
+      <p>Live CPU, memory, disk and network for every server and container, from a sub-15 MB agent.</p>
+      <ul><li>10 alert rules preconfigured</li><li>Uptime checks auto-created per domain</li><li>Public status page</li><li>Discord, Slack, Telegram, email, webhooks</li></ul>
+    </div>
+    <div class="card">
+      <div class="ico">✦</div>
+      <h3>Claude-native</h3>
+      <p>A first-party MCP server and Claude Code plugin. Claude deploys, reads metrics, diagnoses and fixes, always with your consent.</p>
+      <ul><li>34 MCP tools + deterministic <code>diagnose</code></li><li>Skills: deploy, diagnose, incident, dockerize</li><li>SRE subagent</li><li>No AI inside Docksy, ever</li></ul>
+    </div>
+    <div class="card">
+      <div class="ico">🚀</div>
+      <h3>Simple, reliable deploys</h3>
+      <p>Push to GitHub and it ships. The old version keeps serving until the new one is healthy.</p>
+      <ul><li>Dockerfile, compose, image or auto-detect</li><li>Automatic HTTPS (Caddy)</li><li>One-click rollback</li><li>One-click databases + verified backups</li></ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <h2>Your on-call SRE, in the terminal</h2>
+  <p class="sub">An alert fires. You type one line. Claude gathers the evidence, explains the cause, and fixes it once you say yes.</p>
+  <div class="mock">
+    <div class="mock-bar"><i></i><i></i><i></i></div>
+<pre><span class="u">&gt; /docksy:diagnose api</span>
+
+<span class="m">● docksy · diagnose(appId: "api")</span>
+<span class="m">● docksy · get_server_metrics(prod-1, 1h)   mem ▁▂▂▃▅▆▇██ 97%</span>
+<span class="m">● docksy · list_deployments(api)</span>
+
+<span class="b">▸ api: crash-looping, OOM-killed 6× in 10 min</span>
+Cause:    deploy <span class="w">a1b2c3d</span> (13:58, "add in-memory cache") → memory 61% → 97%
+          → container OOMKilled → 502s on api.example.com   <span class="m">(confidence: high)</span>
+Evidence: State.OOMKilled=true · RestartCount 6 · uptime check down since 14:03
+Fix:      1. rollback_app(api → 9f8e7d6, yesterday 18:20)  zero downtime, ~30s
+          2. cap the cache size, then redeploy
+
+<span class="u">Roll back api to 9f8e7d6?</span> <span class="k">yes</span>
+<span class="k">✓ Rolled back. Memory 58%, uptime check green, alert resolved.</span></pre>
+  </div>
+</section>
+
+<section class="section" id="compare" style="padding-top:0">
+  <h2>Docksy vs Coolify</h2>
+  <p class="sub">Coolify is a great, far more mature project with a much larger catalog, and we owe it a lot. This is an honest look at where each one stands.</p>
+  <div style="max-width:860px;margin:0 auto">
+  <table class="compare">
+    <tr><th>Capability</th><th>Docksy</th><th>Coolify</th></tr>
+    <tr><td>Open source, self-hosted</td><td class="yes">✓ Apache-2.0</td><td class="yes">✓ Apache-2.0</td></tr>
+    <tr><td>Git-push deploys, rollback, automatic HTTPS</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Server &amp; container metrics</td><td class="yes">✓ on by default</td><td class="yes">✓ (Sentinel)</td></tr>
+    <tr><td>CPU &amp; memory alerts</td><td class="yes">✓ default rules</td><td class="no">✗</td></tr>
+    <tr><td>Disk usage alerts</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Uptime checks &amp; public status page</td><td class="yes">✓</td><td class="no">✗</td></tr>
+    <tr><td>Scheduled database backups to S3</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Automatic backup restore verification</td><td class="yes">✓</td><td class="no">✗</td></tr>
+    <tr><td>MCP server</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Deterministic <code>diagnose</code> tool for AI</td><td class="yes">✓</td><td class="no">✗</td></tr>
+    <tr><td>Claude Code plugin (skills, SRE agent, safety hook)</td><td class="yes">✓</td><td class="no">✗</td></tr>
+    <tr><td>One-click services catalog</td><td class="part">12 templates</td><td class="yes">✓ hundreds</td></tr>
+    <tr><td>Preview deployments, Swarm, many git providers</td><td class="no">not yet</td><td class="yes">✓</td></tr>
+    <tr><td>Paid tiers</td><td class="yes">none, free forever</td><td class="part">free self-hosted; paid cloud option</td></tr>
+  </table>
+  <p style="color:var(--muted);font-size:13px;text-align:center">Based on Coolify's public source and docs as of November 2026. Spotted something wrong? <a href="https://github.com/osmanyousaaf/docksy/issues">Tell us</a> and we'll fix it.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <h2>Get going</h2>
+  <p class="sub">From a fresh VPS to a live, monitored app in a few minutes.</p>
+  <div class="grid3">
+    <a class="card" href="install.html" style="color:inherit;text-decoration:none"><div class="ico">1</div><h3>Install</h3><p>One command on any Linux box with root.</p></a>
+    <a class="card" href="servers.html" style="color:inherit;text-decoration:none"><div class="ico">2</div><h3>Add servers</h3><p>Paste one SSH line. Docksy provisions Docker, the proxy and the agent.</p></a>
+    <a class="card" href="apps.html" style="color:inherit;text-decoration:none"><div class="ico">3</div><h3>Deploy</h3><p>Point it at a repo, or just tell Claude "deploy this".</p></a>
+  </div>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

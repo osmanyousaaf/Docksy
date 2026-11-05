@@ -1,0 +1,23 @@
+{
+  "name": "@crovenai/docksy-mcp",
+  "version": "0.1.0",
+  "description": "Docksy MCP server — let Claude deploy, monitor and fix your servers.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "docksy-mcp": "./dist/docksy-mcp.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "mcpName": "io.github.osmanyousaaf/docksy",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/docksy-mcp.js --banner:js=\"#!/usr/bin/env node\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test --test-reporter=spec \"src/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  }
+}

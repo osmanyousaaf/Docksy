@@ -1,0 +1,17 @@
+{
+  "description": "Docksy safety net: always ask before a destructive Docksy action (delete an app, delete a server, restore a backup), even in auto mode.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^mcp__(plugin_docksy_)?docksy__(delete_app|delete_server|restore_backup)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '%s\\n' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"Docksy: this action is destructive and cannot be undone (delete app, delete server or restore backup). Check the target, then confirm.\"}}'",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

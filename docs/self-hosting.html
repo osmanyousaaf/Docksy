@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Self-hosting &amp; security · Docksy</title>
+<meta name="description" content="Architecture, stored data, network calls and hardening.">
+<meta property="og:title" content="Self-hosting &amp; security · Docksy">
+<meta property="og:description" content="Architecture, stored data, network calls and hardening.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html">Docs</a>
+    <a href="claude.html">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<div class="layout">
+<aside class="sidebar"><h4>Get started</h4><ul><li><a href="install.html">Install</a></li><li><a href="servers.html">Servers</a></li></ul><h4>Use Docksy</h4><ul><li><a href="apps.html">Apps &amp; deploys</a></li><li><a href="monitoring.html">Monitoring &amp; alerts</a></li><li><a href="backups.html">Backups</a></li></ul><h4>Claude</h4><ul><li><a href="claude.html">Claude &amp; MCP</a></li><li><a href="cli.html">CLI</a></li></ul><h4>Reference</h4><ul><li><a href="self-hosting.html" class="active">Self-hosting &amp; security</a></li><li><a href="faq.html">FAQ</a></li></ul></aside>
+<main class="content">
+<h1>Self-hosting &amp; security</h1>
+<p class="lead">Docksy runs entirely on your infrastructure. Here's what it stores, what it talks to, and how to keep it locked down.</p>
+
+<h2 id="architecture">Architecture</h2>
+<ul>
+  <li><strong>Control plane:</strong> one container (<code>ghcr.io/osmanyousaaf/docksy</code>) running the Node API, the web UI and background jobs, with SQLite as the database. All state lives in <code>/data</code>.</li>
+  <li><strong>Your servers:</strong> Docker, the <code>docksy-proxy</code> Caddy container (80/443), your app containers, and the <code>docksy-agent</code> metrics service.</li>
+  <li><strong>Control plane → server:</strong> SSH with Docksy's own ed25519 key. Connections are pooled and closed after 60 seconds idle.</li>
+  <li><strong>Server → control plane:</strong> the agent POSTs metrics over HTTPS with a per-server token. No inbound ports are needed on servers except 80/443 for your apps.</li>
+</ul>
+
+<h2 id="data">What Docksy stores</h2>
+<table>
+  <tr><th>Data</th><th>Protection</th></tr>
+  <tr><td>Passwords</td><td>Salted scrypt hash</td></tr>
+  <tr><td>API tokens, agent tokens, sessions</td><td>Stored as SHA-256 hashes. The plaintext is shown once</td></tr>
+  <tr><td>Env vars, git tokens, S3 secrets, channel secrets</td><td>Encrypted at rest (AES-256-GCM) with <code>DOCKSY_SECRET</code></td></tr>
+  <tr><td>SSH private key</td><td><code>/data/keys/id_ed25519</code>. Keep the <code>/data</code> volume private</td></tr>
+  <tr><td>Metrics, logs, activity</td><td>SQLite in <code>/data</code>, with retention limits</td></tr>
+</table>
+<div class="callout warn"><p><strong>Back up <code>/data</code>, and keep <code>DOCKSY_SECRET</code> somewhere safe.</strong> Without the secret, the encrypted values can't be recovered.</p></div>
+
+<h2 id="network">Network calls</h2>
+<p>Docksy makes <strong>no telemetry, analytics, licence or update calls</strong>. It contacts:</p>
+<ul>
+  <li>your servers (SSH)</li>
+  <li>your git host, when cloning (from your server)</li>
+  <li>your notification channels (Discord, Slack, Telegram, webhooks, SMTP)</li>
+  <li>your S3 endpoint, if configured</li>
+  <li>the URLs you set up uptime checks for</li>
+</ul>
+<p>Servers download Docker from <code>get.docker.com</code> during provisioning, and the agent binary from your Docksy instance (falling back to GitHub Releases).</p>
+
+<h2 id="hardening">Hardening checklist</h2>
+<ul>
+  <li>Serve the dashboard over <strong>HTTPS</strong> behind a reverse proxy, and set the Public URL to the https address.</li>
+  <li>Restrict port 8080 to localhost or your VPN, and expose only the proxy.</li>
+  <li>Use a strong owner password. Login is rate-limited (10 attempts per minute per IP).</li>
+  <li>Use <strong>read</strong>-scoped API tokens wherever you can, one token per tool or person, and revoke unused ones.</li>
+  <li>On app servers, allow SSH (22) only from the Docksy host's IP.</li>
+  <li>Keep Docksy updated: <code>docker compose pull &amp;&amp; docker compose up -d</code>.</li>
+  <li>Review <strong>Settings → Activity</strong>. Every write is logged with its actor.</li>
+</ul>
+
+<h2 id="roles">Roles</h2>
+<p>Users are <em>owner</em>, <em>admin</em> or <em>viewer</em>. API tokens are scoped <em>full</em> or <em>read</em>.</p>
+
+<h2 id="reporting">Reporting a vulnerability</h2>
+<p>Please <strong>don't open a public issue</strong>. Use GitHub's <a href="https://github.com/osmanyousaaf/docksy/security/advisories/new">private vulnerability reporting</a>. See <a href="https://github.com/osmanyousaaf/docksy/blob/main/SECURITY.md">SECURITY.md</a> for scope and timelines.</p>
+<nav class="pager"><a href="cli.html"><small>← Previous</small>CLI</a><a class="next" href="faq.html"><small>Next →</small>FAQ</a></nav>
+<p style="margin-top:2rem;font-size:13px;color:var(--muted)"><a href="https://github.com/osmanyousaaf/docksy/edit/main/docs/self-hosting.html">Edit this page on GitHub</a></p>
+</main>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

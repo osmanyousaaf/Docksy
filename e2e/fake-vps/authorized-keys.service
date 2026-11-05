@@ -1,0 +1,10 @@
+[Unit]
+Description=Docksy e2e: install SSH_AUTHORIZED_KEYS for root
+Before=ssh.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/docksy-e2e-authorized-keys
+
+[Install]
+WantedBy=multi-user.target

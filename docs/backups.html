@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backups · Docksy</title>
+<meta name="description" content="Scheduled database backups with automatic restore verification.">
+<meta property="og:title" content="Backups · Docksy">
+<meta property="og:description" content="Scheduled database backups with automatic restore verification.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html">Docs</a>
+    <a href="claude.html">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<div class="layout">
+<aside class="sidebar"><h4>Get started</h4><ul><li><a href="install.html">Install</a></li><li><a href="servers.html">Servers</a></li></ul><h4>Use Docksy</h4><ul><li><a href="apps.html">Apps &amp; deploys</a></li><li><a href="monitoring.html">Monitoring &amp; alerts</a></li><li><a href="backups.html" class="active">Backups</a></li></ul><h4>Claude</h4><ul><li><a href="claude.html">Claude &amp; MCP</a></li><li><a href="cli.html">CLI</a></li></ul><h4>Reference</h4><ul><li><a href="self-hosting.html">Self-hosting &amp; security</a></li><li><a href="faq.html">FAQ</a></li></ul></aside>
+<main class="content">
+<h1>Backups</h1>
+<p class="lead">Scheduled database backups that are actually proven to restore. After each run, Docksy restores the dump into a throwaway container and checks it.</p>
+
+<h2 id="supported">Supported databases</h2>
+<table>
+  <tr><th>Template</th><th>Dump method</th><th>Verification query</th></tr>
+  <tr><td>PostgreSQL</td><td><code>pg_dumpall</code></td><td><code>SELECT 1</code> + database count</td></tr>
+  <tr><td>MySQL / MariaDB</td><td><code>mysqldump --all-databases</code></td><td><code>SELECT 1</code> + database count</td></tr>
+  <tr><td>MongoDB</td><td><code>mongodump --archive</code></td><td><code>db.stats()</code></td></tr>
+  <tr><td>Redis</td><td><code>BGSAVE</code> + copy <code>dump.rdb</code></td><td><code>DBSIZE</code></td></tr>
+</table>
+
+<h2 id="create">Create a backup job</h2>
+<p>Open a database app → <strong>Backups</strong> → <strong>New backup</strong>:</p>
+<ul>
+  <li><strong>Schedule:</strong> hourly, daily or weekly</li>
+  <li><strong>Retention:</strong> keep the last <em>N</em> runs</li>
+  <li><strong>Destination:</strong> local (<code>/var/lib/docksy/backups/&lt;app&gt;/</code> on the server) or any S3-compatible storage (AWS S3, Cloudflare R2, Backblaze B2, MinIO…), with endpoint, bucket, region, keys and prefix. The secret key is write-only.</li>
+  <li><strong>Verify after each run:</strong> on by default. Leave it on.</li>
+</ul>
+<p>You can also <strong>Run now</strong> at any time. Running a backup once right after setup is a good idea.</p>
+
+<h2 id="how">How a run works</h2>
+<ol>
+  <li>The dump runs inside the database container: <code>docker exec … | gzip &gt; /var/lib/docksy/backups/&lt;app&gt;/&lt;timestamp&gt;.gz</code></li>
+  <li>If configured, it's uploaded to S3-compatible storage.</li>
+  <li>Old runs are pruned down to the retention count.</li>
+  <li><strong>Verification:</strong> a temporary container from the same image starts, the dump is restored into it, a sanity query runs, and the container is removed. The run is marked <code>passed</code> or <code>failed</code>.</li>
+</ol>
+<p>A failed run <em>or</em> a failed verification fires the critical <strong>Backup failed</strong> alert.</p>
+
+<h2 id="restore">Restore</h2>
+<div class="callout warn"><p><strong>Restoring overwrites the live database.</strong> Docksy requires an explicit confirmation in the UI, the API (<code>{"confirm": true}</code>), the CLI and MCP. The Claude plugin adds one more confirmation prompt on top.</p></div>
+<p>Pick a run (preferably one with <em>verified: passed</em>) → <strong>Restore</strong> → confirm.</p>
+
+<h2 id="why-verify">Why verification matters</h2>
+<p>A backup you've never restored is a hope, not a backup. Dumps silently break: a truncated upload, a version mismatch, a dump taken while a disk was full. Docksy catches these the day they happen, not the day you need the backup.</p>
+<div class="callout ai"><p>Ask Claude: <em>"add Postgres for my api app with verified daily backups"</em>. The <code>docksy-add-database</code> skill creates the database, wires <code>DATABASE_URL</code>, and runs and verifies the first backup.</p></div>
+<nav class="pager"><a href="monitoring.html"><small>← Previous</small>Monitoring &amp; alerts</a><a class="next" href="claude.html"><small>Next →</small>Claude &amp; MCP</a></nav>
+<p style="margin-top:2rem;font-size:13px;color:var(--muted)"><a href="https://github.com/osmanyousaaf/docksy/edit/main/docs/backups.html">Edit this page on GitHub</a></p>
+</main>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

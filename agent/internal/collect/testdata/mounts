@@ -1,0 +1,16 @@
+sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+udev /dev devtmpfs rw,nosuid,relatime,size=1990000k 0 0
+devpts /dev/pts devpts rw,nosuid,noexec,relatime 0 0
+tmpfs /run tmpfs rw,nosuid,nodev,noexec,relatime,size=402536k,mode=755 0 0
+/dev/vda1 / ext4 rw,relatime,discard,errors=remount-ro 0 0
+securityfs /sys/kernel/security securityfs rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /dev/shm tmpfs rw,nosuid,nodev 0 0
+cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime 0 0
+/dev/loop0 /snap/core22/1380 squashfs ro,nodev,relatime 0 0
+/dev/vda15 /boot/efi vfat rw,relatime,fmask=0077,dmask=0077 0 0
+/dev/sdb1 /mnt/my\040data xfs rw,relatime 0 0
+/dev/vda1 /var/lib/docker/some/bind ext4 rw,relatime 0 0
+/dev/vda1 /srv/bind ext4 rw,relatime 0 0
+overlay /var/lib/docker/overlay2/abc/merged overlay rw,relatime,lowerdir=/x 0 0
+nsfs /run/docker/netns/abc nsfs rw 0 0

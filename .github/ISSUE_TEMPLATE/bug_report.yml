@@ -1,0 +1,62 @@
+name: Bug report
+description: Something in Docksy is broken or behaves unexpectedly.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Please remove secrets (tokens, passwords, IPs you don't want public) from logs before pasting.
+        Security issue? Please don't file it here: see SECURITY.md for private reporting.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Add a server …
+        2. Deploy app …
+        3. See error …
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Docksy version
+      description: Shown in Settings → About, or `curl <docksy>/api/v1/health`.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Install / upgrade
+        - Servers / provisioning
+        - Deployments
+        - Monitoring / metrics agent
+        - Alerts / uptime / status page
+        - Backups
+        - Web UI
+        - CLI
+        - MCP server / Claude Code plugin
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Server OS
+      placeholder: "Ubuntu 24.04, amd64"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: "`docker logs docksy --tail 200`, the deployment or provisioning log, or `journalctl -u docksy-agent -n 100`."
+      render: shell

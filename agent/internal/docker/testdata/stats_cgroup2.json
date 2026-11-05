@@ -1,0 +1,5 @@
+{"read":"2026-11-01T11:00:01.000000000Z","preread":"2026-11-01T11:00:00.000000000Z",
+ "cpu_stats":{"cpu_usage":{"total_usage":400000000,"usage_in_kernelmode":1,"usage_in_usermode":1},"system_cpu_usage":20000000000,"online_cpus":4,"throttling_data":{}},
+ "precpu_stats":{"cpu_usage":{"total_usage":200000000},"system_cpu_usage":18000000000,"online_cpus":4},
+ "memory_stats":{"usage":104857600,"limit":2147483648,"stats":{"inactive_file":4194304,"active_file":1,"anon":90000000}},
+ "networks":{"eth0":{"rx_bytes":10000,"tx_bytes":5000},"eth1":{"rx_bytes":1000,"tx_bytes":500}}}

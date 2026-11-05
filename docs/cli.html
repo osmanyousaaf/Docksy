@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLI · Docksy</title>
+<meta name="description" content="The docksy command-line client.">
+<meta property="og:title" content="CLI · Docksy">
+<meta property="og:description" content="The docksy command-line client.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html">Docs</a>
+    <a href="claude.html">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<div class="layout">
+<aside class="sidebar"><h4>Get started</h4><ul><li><a href="install.html">Install</a></li><li><a href="servers.html">Servers</a></li></ul><h4>Use Docksy</h4><ul><li><a href="apps.html">Apps &amp; deploys</a></li><li><a href="monitoring.html">Monitoring &amp; alerts</a></li><li><a href="backups.html">Backups</a></li></ul><h4>Claude</h4><ul><li><a href="claude.html">Claude &amp; MCP</a></li><li><a href="cli.html" class="active">CLI</a></li></ul><h4>Reference</h4><ul><li><a href="self-hosting.html">Self-hosting &amp; security</a></li><li><a href="faq.html">FAQ</a></li></ul></aside>
+<main class="content">
+<h1>CLI</h1>
+<p class="lead"><code>docksy</code> is a fast, scriptable terminal client for everything in the dashboard, including a live, top-like metrics view.</p>
+
+<h2 id="install">Install</h2>
+<pre><span class="p">$ </span>npm install -g @crovenai/docksy
+<span class="p">$ </span>docksy login https://docksy.example.com --token dsk_...</pre>
+<p>Requires Node 20+. The config is stored in <code>~/.config/docksy/config.json</code>. The environment variables <code>DOCKSY_URL</code> and <code>DOCKSY_TOKEN</code> override it, which is handy in CI.</p>
+
+<h2 id="commands">Commands</h2>
+<table>
+  <tr><th>Command</th><th>What it does</th></tr>
+  <tr><td><code>docksy login &lt;url&gt; [--token]</code></td><td>Save the instance URL and API token</td></tr>
+  <tr><td><code>docksy status</code></td><td>Fleet overview with colored usage bars and sparklines</td></tr>
+  <tr><td><code>docksy servers [ls|add|rm|provision]</code></td><td>Manage servers</td></tr>
+  <tr><td><code>docksy apps [ls|create|rm]</code></td><td>Manage apps</td></tr>
+  <tr><td><code>docksy deploy &lt;app&gt; [--follow]</code></td><td>Deploy, optionally streaming the build log</td></tr>
+  <tr><td><code>docksy logs &lt;app&gt; [-f]</code></td><td>Runtime logs, optionally followed</td></tr>
+  <tr><td><code>docksy rollback &lt;app&gt; [deploymentId]</code></td><td>Roll back to the previous (or a given) good deployment</td></tr>
+  <tr><td><code>docksy env &lt;app&gt; [ls|set K=V…|unset K]</code></td><td>Environment variables</td></tr>
+  <tr><td><code>docksy metrics &lt;server&gt; [--watch]</code></td><td>A live, top-like TUI with sparklines</td></tr>
+  <tr><td><code>docksy diagnose [server|app]</code></td><td>Run diagnose and print the findings</td></tr>
+  <tr><td><code>docksy alerts</code></td><td>Firing and recent alerts</td></tr>
+  <tr><td><code>docksy open</code></td><td>Open the dashboard in your browser</td></tr>
+  <tr><td><code>docksy mcp</code></td><td>Run the Docksy MCP server in-process (stdio)</td></tr>
+</table>
+<p>Every read command accepts <code>--json</code> for scripting:</p>
+<pre><span class="p">$ </span>docksy status --json | jq .</pre>
+
+<h2 id="ci">Deploy from CI</h2>
+<pre><span class="c"># .github/workflows/deploy.yml (excerpt)</span>
+- run: npx -y @crovenai/docksy deploy api --follow
+  env:
+    DOCKSY_URL: ${{ secrets.DOCKSY_URL }}
+    DOCKSY_TOKEN: ${{ secrets.DOCKSY_TOKEN }}</pre>
+<p>Most people use the <a href="apps.html#auto-deploy">GitHub webhook</a> instead. Deploying from CI is useful when you want tests to gate the deploy.</p>
+<nav class="pager"><a href="claude.html"><small>← Previous</small>Claude &amp; MCP</a><a class="next" href="self-hosting.html"><small>Next →</small>Self-hosting &amp; security</a></nav>
+<p style="margin-top:2rem;font-size:13px;color:var(--muted)"><a href="https://github.com/osmanyousaaf/docksy/edit/main/docs/cli.html">Edit this page on GitHub</a></p>
+</main>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

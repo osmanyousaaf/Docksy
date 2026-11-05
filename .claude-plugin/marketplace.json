@@ -1,0 +1,20 @@
+{
+  "name": "docksy",
+  "description": "Docksy: deploy to your own servers. It watches them for you, and Claude can fix them. Free forever, open source, self-hosted.",
+  "owner": {
+    "name": "Crovenai",
+    "url": "https://github.com/crovenai"
+  },
+  "plugins": [
+    {
+      "name": "docksy",
+      "source": "./plugin",
+      "description": "Deploy, monitor, diagnose and fix your Docksy servers and apps from Claude Code: MCP server, skills, slash commands, an SRE agent and a safety hook.",
+      "category": "devops",
+      "tags": ["paas", "self-hosted", "deploy", "docker", "monitoring", "sre", "mcp"],
+      "homepage": "https://osmanyousaaf.github.io/docksy/claude.html",
+      "repository": "https://github.com/osmanyousaaf/docksy",
+      "license": "Apache-2.0"
+    }
+  ]
+}

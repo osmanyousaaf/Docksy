@@ -1,0 +1,44 @@
+name: E2E
+
+# Full loop against a local fake VPS (systemd + sshd + Docker-in-Docker):
+# setup -> add server -> provision -> deploy sample app -> metrics arrive.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build -w @docksy/web
+      - name: Build agent binaries
+        if: ${{ hashFiles('agent/go.mod') != '' }}
+        run: |
+          docker run --rm -v "$PWD/agent":/src -w /src -e CGO_ENABLED=0 golang:1.24 sh -c \
+            'for a in amd64 arm64; do GOOS=linux GOARCH=$a go build -trimpath -ldflags "-s -w" -o bin/docksy-agent-linux-$a ./cmd/docksy-agent; done'
+      - name: Run e2e
+        run: bash e2e/run.sh
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-logs
+          path: ${{ runner.temp }}/docksy-e2e*/**/*.log
+          if-no-files-found: ignore

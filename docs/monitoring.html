@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitoring &amp; alerts · Docksy</title>
+<meta name="description" content="Metrics, default alert rules, uptime checks, status page and diagnose.">
+<meta property="og:title" content="Monitoring &amp; alerts · Docksy">
+<meta property="og:description" content="Metrics, default alert rules, uptime checks, status page and diagnose.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html">Docs</a>
+    <a href="claude.html">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<div class="layout">
+<aside class="sidebar"><h4>Get started</h4><ul><li><a href="install.html">Install</a></li><li><a href="servers.html">Servers</a></li></ul><h4>Use Docksy</h4><ul><li><a href="apps.html">Apps &amp; deploys</a></li><li><a href="monitoring.html" class="active">Monitoring &amp; alerts</a></li><li><a href="backups.html">Backups</a></li></ul><h4>Claude</h4><ul><li><a href="claude.html">Claude &amp; MCP</a></li><li><a href="cli.html">CLI</a></li></ul><h4>Reference</h4><ul><li><a href="self-hosting.html">Self-hosting &amp; security</a></li><li><a href="faq.html">FAQ</a></li></ul></aside>
+<main class="content">
+<h1>Monitoring &amp; alerts</h1>
+<p class="lead">Monitoring is on by default. When a server is provisioned you get live metrics, ten sensible alert rules, uptime checks and an optional public status page, with nothing to configure.</p>
+
+<h2 id="metrics">Metrics</h2>
+<ul>
+  <li><strong>Servers:</strong> CPU (total and per core), load, memory, swap, disk and network rx/tx.</li>
+  <li><strong>Containers:</strong> CPU %, memory, network, state and restart count.</li>
+  <li><strong>Resolution:</strong> raw 10-second points for 48 hours, 1-minute rollups for 14 days, and 1-hour rollups for the configured retention (Settings → <em>Metrics retention</em>).</li>
+  <li><strong>Live:</strong> charts update over server-sent events as each report arrives.</li>
+</ul>
+<p>Ranges up to 6h use raw points, 24h–7d use minute rollups, and 30d uses hourly rollups. Every chart is downsampled to at most 400 points, so it stays fast.</p>
+
+<h2 id="default-rules">Default alert rules</h2>
+<p>These rules are created on first start and apply to every server and app:</p>
+<table>
+  <tr><th>Rule</th><th>Condition</th><th>Severity</th></tr>
+  <tr><td>CPU</td><td>&gt; 90% for 5 min</td><td>warning</td></tr>
+  <tr><td>Memory</td><td>&gt; 90% for 5 min</td><td>critical</td></tr>
+  <tr><td>Disk</td><td>&gt; 85%</td><td>warning</td></tr>
+  <tr><td>Disk</td><td>&gt; 95%</td><td>critical</td></tr>
+  <tr><td>Server offline</td><td>no agent report for 2 min</td><td>critical</td></tr>
+  <tr><td>Container down</td><td>a managed container isn't running</td><td>critical</td></tr>
+  <tr><td>Container restarts</td><td>&gt; 3 in 10 min</td><td>warning</td></tr>
+  <tr><td>Deploy failed</td><td>any failed deployment</td><td>warning</td></tr>
+  <tr><td>Uptime down</td><td>an uptime check fails</td><td>critical</td></tr>
+  <tr><td>Backup failed</td><td>a backup run or its verification fails</td><td>critical</td></tr>
+</table>
+<p>You can edit thresholds, disable rules, or add your own. A rule can be scoped to one server or app, or apply to all of them. Metric rules support <code>cpu</code>, <code>mem</code>, <code>disk</code>, <code>load</code> and <code>swap</code>.</p>
+
+<h2 id="lifecycle">How alerts behave</h2>
+<ul>
+  <li>Each condition has <strong>one firing alert</strong>, so you're not spammed. Repeats are deduplicated.</li>
+  <li>An alert <strong>resolves automatically</strong> when its condition clears, and you're notified then too.</li>
+  <li><strong>Acknowledge</strong> an alert to show that someone is on it.</li>
+  <li>Messages are short and human, and end with a hint: <em>Ask Claude: <code>/docksy:diagnose prod-1</code></em>.</li>
+</ul>
+
+<h2 id="channels">Notification channels</h2>
+<table>
+  <tr><th>Channel</th><th>Config</th></tr>
+  <tr><td>Discord</td><td>webhook URL</td></tr>
+  <tr><td>Slack</td><td>incoming webhook URL</td></tr>
+  <tr><td>Telegram</td><td>bot token + chat id</td></tr>
+  <tr><td>Generic webhook</td><td>URL + optional secret (JSON POST)</td></tr>
+  <tr><td>Email</td><td>SMTP host, port, TLS, user, password, from, to</td></tr>
+</table>
+<p>Each channel has a <strong>Test</strong> button. A rule with no channels selected notifies every enabled channel.</p>
+
+<h2 id="uptime">Uptime checks</h2>
+<ul>
+  <li>HTTP(S) checks every 30 seconds or more, with a timeout and an expected status (or any 2xx/3xx).</li>
+  <li>When an app gets a domain, Docksy <strong>creates a check for it automatically</strong> after its first successful deploy.</li>
+  <li>Results are kept for 90 days, with uptime % and average latency shown for the last 24 hours.</li>
+  <li>A failing check fires the <em>Uptime down</em> alert, and recovery resolves it.</li>
+</ul>
+
+<h2 id="status-page">Public status page</h2>
+<p>Turn it on in <strong>Settings → Status page</strong> and choose which checks are public. It's served at <code>/status</code>, with an overall state (operational / degraded / down) and 90 days of daily uptime bars. It's disabled by default and returns 404 until you enable it.</p>
+
+<h2 id="diagnose">Diagnose</h2>
+<p><strong>Diagnose</strong> is a deterministic, rule-based health check for a server or an app. No AI runs inside Docksy. It returns findings with evidence, a suggestion, and often a ready-to-run fix that Claude can execute (with your consent). It checks:</p>
+<ul>
+  <li>high CPU or memory, with the top containers by usage</li>
+  <li>disk nearly full, with prune suggestions</li>
+  <li>swap thrashing</li>
+  <li>an offline agent</li>
+  <li>restart loops and OOM-kills</li>
+  <li>a failed last deploy, with its error and the build-log tail</li>
+  <li>recent errors in app logs</li>
+  <li>expired or missing TLS</li>
+  <li>failing uptime checks</li>
+</ul>
+<div class="callout ai"><p>Click <strong>Ask Claude to diagnose</strong> on any server page, run <code>docksy diagnose prod-1</code>, or type <code>/docksy:diagnose prod-1</code> in Claude Code. See <a href="claude.html">Claude &amp; MCP</a>.</p></div>
+<nav class="pager"><a href="apps.html"><small>← Previous</small>Apps &amp; deploys</a><a class="next" href="backups.html"><small>Next →</small>Backups</a></nav>
+<p style="margin-top:2rem;font-size:13px;color:var(--muted)"><a href="https://github.com/osmanyousaaf/docksy/edit/main/docs/monitoring.html">Edit this page on GitHub</a></p>
+</main>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

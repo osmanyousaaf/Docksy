@@ -1,0 +1,31 @@
+{
+  "name": "docksy",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Docksy — deploy to your own servers. It watches them for you, and Claude can fix them. Free forever.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "workspaces": [
+    "packages/shared",
+    "packages/client",
+    "packages/cli",
+    "packages/mcp",
+    "apps/server",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev -w @docksy/server",
+    "dev:web": "npm run dev -w @docksy/web",
+    "build": "npm run build -w @docksy/web && npm run build -w @crovenai/docksy-client && npm run build -w @crovenai/docksy && npm run build -w @crovenai/docksy-mcp",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

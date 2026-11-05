@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/*
+ * Docksy design tokens — formal black & gray (see apps/web/DESIGN.md).
+ * Neutral grayscale everywhere. Color is reserved for status only (ok / warn / bad), used sparingly.
+ * No gradients, glows, shadows or colored icon tiles.
+ */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-bg: #0a0a0a;        /* page */
+  --color-surface: #121212;   /* panels, inputs, sidebar */
+  --color-surface-2: #1a1a1a; /* hover, active nav item, table header */
+  --color-surface-3: #222222; /* pressed, selected */
+  --color-border: #262626;
+  --color-border-strong: #333333;
+  --color-fg: #ededed;
+  --color-muted: #8f8f8f;
+  --color-faint: #5c5c5c;
+
+  /* kept for compatibility: "brand" is now plain white/gray, never a hue */
+  --color-brand: #fafafa;
+  --color-brand-2: #d4d4d4;
+
+  --color-ok: #22c55e;
+  --color-warn: #eab308;
+  --color-bad: #ef4444;
+
+  /* chart series — monochrome */
+  --color-cpu: #e5e5e5;
+  --color-mem: #a3a3a3;
+  --color-disk: #737373;
+  --color-net-rx: #d4d4d4;
+  --color-net-tx: #737373;
+
+  --radius-DEFAULT: 6px;
+}
+
+html, body, #root { height: 100%; }
+html { color-scheme: dark; }
+body { @apply bg-bg text-fg font-sans antialiased; font-size: 14px; }
+::selection { background: #3a3a3a; }
+
+/* thin neutral scrollbars */
+* { scrollbar-width: thin; scrollbar-color: #333 transparent; }

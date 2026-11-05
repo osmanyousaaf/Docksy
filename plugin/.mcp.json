@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "docksy": {
+      "command": "npx",
+      "args": ["-y", "@crovenai/docksy-mcp"],
+      "env": {
+        "DOCKSY_URL": "${DOCKSY_URL}",
+        "DOCKSY_TOKEN": "${DOCKSY_TOKEN}",
+        "DOCKSY_READONLY": "${DOCKSY_READONLY:-}"
+      }
+    }
+  }
+}

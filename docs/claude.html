@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude &amp; MCP · Docksy</title>
+<meta name="description" content="Connect Claude Code to Docksy: plugin, MCP server and full tool list.">
+<meta property="og:title" content="Claude &amp; MCP · Docksy">
+<meta property="og:description" content="Connect Claude Code to Docksy: plugin, MCP server and full tool list.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html">Docs</a>
+    <a href="claude.html" class="active">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<div class="layout">
+<aside class="sidebar"><h4>Get started</h4><ul><li><a href="install.html">Install</a></li><li><a href="servers.html">Servers</a></li></ul><h4>Use Docksy</h4><ul><li><a href="apps.html">Apps &amp; deploys</a></li><li><a href="monitoring.html">Monitoring &amp; alerts</a></li><li><a href="backups.html">Backups</a></li></ul><h4>Claude</h4><ul><li><a href="claude.html" class="active">Claude &amp; MCP</a></li><li><a href="cli.html">CLI</a></li></ul><h4>Reference</h4><ul><li><a href="self-hosting.html">Self-hosting &amp; security</a></li><li><a href="faq.html">FAQ</a></li></ul></aside>
+<main class="content">
+<h1>Claude &amp; MCP</h1>
+<p class="lead">Docksy is built to be operated by Claude. A first-party MCP server and a Claude Code plugin let Claude deploy, read live metrics, diagnose problems and fix them, always with your consent.</p>
+
+<div class="callout ai"><p><strong>No AI inside Docksy.</strong> Docksy never calls an LLM and never sends your data anywhere. <code>diagnose</code> is deterministic and returns evidence. Claude, running on <em>your</em> machine with <em>your</em> account, does the reasoning.</p></div>
+
+<h2 id="token">1. Create an API token</h2>
+<p>In Docksy: <strong>Settings → API tokens → New token</strong>. Pick a scope:</p>
+<ul>
+  <li><strong>full</strong>: Claude can deploy, restart, roll back, and so on.</li>
+  <li><strong>read</strong>: Claude can look at everything and change nothing. A great way to start.</li>
+</ul>
+<p>The token (<code>dsk_…</code>) is shown once. The <strong>Claude</strong> page (<code>/claude</code>) in your Docksy dashboard shows ready-to-paste snippets that include it.</p>
+<pre><span class="p">$ </span>export DOCKSY_URL="https://docksy.example.com"
+<span class="p">$ </span>export DOCKSY_TOKEN="dsk_..."</pre>
+<p>Add these to <code>~/.zshrc</code> or <code>~/.bashrc</code> so every session has them.</p>
+
+<h2 id="plugin">2. Install the Claude Code plugin (recommended)</h2>
+<pre><span class="c"># inside Claude Code</span>
+/plugin marketplace add osmanyousaaf/docksy
+/plugin install docksy@docksy</pre>
+<p>Restart Claude Code (or run <code>/reload-plugins</code>), then check that <code>/mcp</code> lists <code>docksy</code> as connected. The plugin bundles:</p>
+<table>
+  <tr><th>Type</th><th>Name</th><th>What it does</th></tr>
+  <tr><td>MCP server</td><td><code>docksy</code></td><td>All the tools below, via <code>npx -y @crovenai/docksy-mcp</code></td></tr>
+  <tr><td>Command</td><td><code>/docksy:deploy [app]</code></td><td>Deploy, watch the build, verify the URL</td></tr>
+  <tr><td>Command</td><td><code>/docksy:status [target]</code></td><td>Fleet health at a glance</td></tr>
+  <tr><td>Command</td><td><code>/docksy:diagnose [target]</code></td><td>Root-cause a slow, failing or down server or app</td></tr>
+  <tr><td>Command</td><td><code>/docksy:logs &lt;app&gt;</code></td><td>Logs with errors highlighted and explained</td></tr>
+  <tr><td>Command</td><td><code>/docksy:rollback &lt;app&gt;</code></td><td>Zero-downtime rollback to a previous good deploy</td></tr>
+  <tr><td>Skill</td><td><code>docksy-deploy</code></td><td>Detect the stack → Dockerfile → create → deploy → watch → verify</td></tr>
+  <tr><td>Skill</td><td><code>docksy-diagnose</code></td><td>Evidence-first diagnosis, fixes only with consent</td></tr>
+  <tr><td>Skill</td><td><code>docksy-incident</code></td><td>Triage → mitigate → root cause → postmortem</td></tr>
+  <tr><td>Skill</td><td><code>docksy-setup-server</code></td><td>Add and provision a VPS</td></tr>
+  <tr><td>Skill</td><td><code>docksy-add-database</code></td><td>One-click database plus verified daily backups</td></tr>
+  <tr><td>Skill</td><td><code>docksy-dockerize</code></td><td>Write a production Dockerfile for your repo</td></tr>
+  <tr><td>Agent</td><td><code>docksy-sre</code></td><td>An SRE subagent for investigations</td></tr>
+  <tr><td>Hook</td><td>PreToolUse</td><td>Always asks before <code>delete_app</code>, <code>delete_server</code>, <code>restore_backup</code></td></tr>
+</table>
+<p>Skills trigger on their own when they're relevant. Just talk to Claude.</p>
+
+<h2 id="mcp-only">Or: MCP server only</h2>
+<p>For Claude Code without the plugin:</p>
+<pre><span class="p">$ </span>claude mcp add docksy --env DOCKSY_URL=https://docksy.example.com --env DOCKSY_TOKEN=dsk_... -- npx -y @crovenai/docksy-mcp</pre>
+<p>For Claude Desktop, or any MCP client that uses a JSON config:</p>
+<pre>{
+  "mcpServers": {
+    "docksy": {
+      "command": "npx",
+      "args": ["-y", "@crovenai/docksy-mcp"],
+      "env": { "DOCKSY_URL": "https://docksy.example.com", "DOCKSY_TOKEN": "dsk_..." }
+    }
+  }
+}</pre>
+<p>With the Docksy CLI installed, <code>docksy mcp</code> runs the same server in-process using your CLI login. For clients that prefer HTTP, <code>docksy-mcp --http</code> serves streamable HTTP on <code>127.0.0.1</code> only.</p>
+
+<h2 id="tools">Tool reference</h2>
+<h3>Read (always safe)</h3>
+<table>
+  <tr><th>Tool</th><th>Purpose</th></tr>
+  <tr><td><code>get_fleet_overview</code></td><td>All servers, apps and firing alerts at a glance</td></tr>
+  <tr><td><code>list_servers</code></td><td>Servers with status and liveness</td></tr>
+  <tr><td><code>get_server</code></td><td>One server: specs, agent, provisioning state</td></tr>
+  <tr><td><code>get_server_metrics</code></td><td>CPU/memory/disk/network over a range, with ASCII sparklines and current/avg/max</td></tr>
+  <tr><td><code>list_containers</code></td><td>Containers on a server, with CPU/memory and restarts</td></tr>
+  <tr><td><code>list_apps</code></td><td>Apps, optionally filtered by server</td></tr>
+  <tr><td><code>get_app</code></td><td>One app: source, build, domains, status</td></tr>
+  <tr><td><code>list_deployments</code></td><td>Recent deployments for an app</td></tr>
+  <tr><td><code>get_deployment_logs</code></td><td>The build/deploy log of a deployment</td></tr>
+  <tr><td><code>get_app_logs</code></td><td>Runtime container logs (tail)</td></tr>
+  <tr><td><code>diagnose</code></td><td>Deterministic health report for a server or app: findings, evidence, suggested fix tools</td></tr>
+  <tr><td><code>list_alerts</code></td><td>Firing or resolved alerts</td></tr>
+  <tr><td><code>list_alert_rules</code></td><td>Alert rules, including the defaults</td></tr>
+  <tr><td><code>list_uptime_checks</code></td><td>Uptime checks with 24h uptime and latency</td></tr>
+  <tr><td><code>list_templates</code></td><td>One-click templates (databases and services)</td></tr>
+  <tr><td><code>list_backups</code></td><td>Backup jobs and their recent runs</td></tr>
+</table>
+<h3>Write (Claude asks before using these)</h3>
+<table>
+  <tr><th>Tool</th><th>Purpose</th></tr>
+  <tr><td><code>create_app</code></td><td>Create an app from a repo, an image or a template</td></tr>
+  <tr><td><code>update_app</code></td><td>Change domains, port, branch, healthcheck, auto-deploy…</td></tr>
+  <tr><td><code>deploy_app</code></td><td>Start a zero-downtime deployment</td></tr>
+  <tr><td><code>rollback_app</code></td><td>Redeploy a previous successful image</td></tr>
+  <tr><td><code>restart_app</code> · <code>stop_app</code> · <code>start_app</code></td><td>Container lifecycle</td></tr>
+  <tr><td><code>set_env_vars</code></td><td>Set or replace environment variables</td></tr>
+  <tr><td><code>create_server</code></td><td>Register a server</td></tr>
+  <tr><td><code>provision_server</code></td><td>Install Docker, the proxy and the agent</td></tr>
+  <tr><td><code>create_alert_rule</code></td><td>Add an alert rule</td></tr>
+  <tr><td><code>ack_alert</code></td><td>Acknowledge a firing alert</td></tr>
+  <tr><td><code>create_uptime_check</code></td><td>Monitor a URL</td></tr>
+  <tr><td><code>create_backup</code></td><td>Schedule backups for a database app</td></tr>
+  <tr><td><code>run_backup</code></td><td>Run a backup now</td></tr>
+</table>
+<h3>Destructive (require <code>confirm: true</code>)</h3>
+<table>
+  <tr><th>Tool</th><th>Purpose</th></tr>
+  <tr><td><code>delete_app</code></td><td>Remove an app and its containers (volumes kept unless asked)</td></tr>
+  <tr><td><code>delete_server</code></td><td>Remove a server from Docksy (refused while it still has apps)</td></tr>
+  <tr><td><code>restore_backup</code></td><td>Overwrite a database from a backup run</td></tr>
+</table>
+<p>Also provided: <strong>resources</strong> <code>docksy://overview</code> and <code>docksy://servers/{id}/metrics</code>, and <strong>prompts</strong> <code>diagnose_server</code>, <code>deploy_new_app</code> and <code>incident_response</code>.</p>
+
+<h2 id="safety">Safety model</h2>
+<ol>
+  <li><strong>Token scope:</strong> a <em>read</em> token can't change anything, server-side.</li>
+  <li><strong>Read-only mode:</strong> <code>DOCKSY_READONLY=1</code> hides every write tool from Claude.</li>
+  <li><strong>Destructive guard:</strong> the three destructive tools refuse to run without <code>confirm: true</code>.</li>
+  <li><strong>Plugin hook:</strong> a <code>PreToolUse</code> hook returns <code>"ask"</code> for those tools, so you always see a permission prompt labelled <code>[plugin:docksy]</code>, even in auto mode.</li>
+  <li><strong>Audit trail:</strong> every write is recorded in Docksy's activity log under the token's name.</li>
+</ol>
+
+<h2 id="examples">Things to ask</h2>
+<pre>deploy this repo to my prod server
+why is prod-1 at 95% memory?
+the api is returning 502s, help
+roll back web to yesterday's version
+add postgres for the api with verified daily backups
+set up my new hetzner box at 203.0.113.7
+dockerize this repo
+alert me on slack when disk goes over 80%
+write a postmortem for this morning's outage</pre>
+<nav class="pager"><a href="backups.html"><small>← Previous</small>Backups</a><a class="next" href="cli.html"><small>Next →</small>CLI</a></nav>
+<p style="margin-top:2rem;font-size:13px;color:var(--muted)"><a href="https://github.com/osmanyousaaf/docksy/edit/main/docs/claude.html">Edit this page on GitHub</a></p>
+</main>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

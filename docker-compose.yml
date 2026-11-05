@@ -1,0 +1,46 @@
+# Docksy control plane.
+#   Local build:   docker compose up -d --build
+#   Released image: DOCKSY_TAG=0.1.0 docker compose up -d
+# Configuration comes from .env next to this file (see install.sh for the keys).
+name: docksy
+
+services:
+  docksy:
+    image: ${DOCKSY_IMAGE:-ghcr.io/osmanyousaaf/docksy}:${DOCKSY_TAG:-latest}
+    build:
+      context: .
+      args:
+        VERSION: ${DOCKSY_TAG:-0.0.0-dev}
+    container_name: docksy
+    restart: unless-stopped
+    init: true
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DOCKSY_DATA_DIR: /data
+      PORT: "8080"
+    ports:
+      - "${DOCKSY_BIND:-0.0.0.0}:${DOCKSY_PORT:-8080}:8080"
+    volumes:
+      - docksy-data:/data
+    # Docksy reaches every server, including this host, over SSH.
+    # No Docker socket is mounted: the container stays unprivileged.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  docksy-data:
+    name: docksy-data

@@ -1,0 +1,27 @@
+{
+  "name": "docksy",
+  "displayName": "Docksy",
+  "version": "0.1.0",
+  "description": "Deploy to your own servers, read live metrics, diagnose and fix incidents with Docksy, the free, open-source, self-hosted PaaS.",
+  "author": {
+    "name": "Crovenai",
+    "url": "https://github.com/crovenai"
+  },
+  "homepage": "https://osmanyousaaf.github.io/docksy/claude.html",
+  "repository": "https://github.com/osmanyousaaf/docksy",
+  "license": "Apache-2.0",
+  "keywords": [
+    "docksy",
+    "paas",
+    "self-hosted",
+    "deploy",
+    "docker",
+    "monitoring",
+    "sre",
+    "mcp",
+    "devops"
+  ],
+  "icon": "./assets/icon.png",
+  "documentationUrl": "https://osmanyousaaf.github.io/docksy/claude.html",
+  "supportUrl": "https://github.com/osmanyousaaf/docksy/issues"
+}

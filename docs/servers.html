@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Servers · Docksy</title>
+<meta name="description" content="Add, provision and monitor servers with Docksy.">
+<meta property="og:title" content="Servers · Docksy">
+<meta property="og:description" content="Add, provision and monitor servers with Docksy.">
+<meta name="theme-color" content="#070b14">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="index.html"><img src="logo.svg" alt="" width="28" height="28">Docksy</a>
+  <nav class="topnav">
+    <a href="install.html">Docs</a>
+    <a href="claude.html">Claude</a>
+    <a href="index.html#compare">Compare</a>
+    <a href="faq.html">FAQ</a>
+    <a class="gh-btn" href="https://github.com/osmanyousaaf/docksy">GitHub</a>
+  </nav>
+</div></header>
+<div class="layout">
+<aside class="sidebar"><h4>Get started</h4><ul><li><a href="install.html">Install</a></li><li><a href="servers.html" class="active">Servers</a></li></ul><h4>Use Docksy</h4><ul><li><a href="apps.html">Apps &amp; deploys</a></li><li><a href="monitoring.html">Monitoring &amp; alerts</a></li><li><a href="backups.html">Backups</a></li></ul><h4>Claude</h4><ul><li><a href="claude.html">Claude &amp; MCP</a></li><li><a href="cli.html">CLI</a></li></ul><h4>Reference</h4><ul><li><a href="self-hosting.html">Self-hosting &amp; security</a></li><li><a href="faq.html">FAQ</a></li></ul></aside>
+<main class="content">
+<h1>Servers</h1>
+<p class="lead">A server is any Linux machine Docksy can reach over SSH. Docksy provisions it once, then deploys to it and watches it.</p>
+
+<h2 id="add">Add a server</h2>
+<ol>
+  <li><strong>Servers → Add server</strong>. Docksy shows its public SSH key (ed25519, generated on first use) and a one-line command.</li>
+  <li>Run that one-liner on the new machine. It appends the key to <code>~/.ssh/authorized_keys</code>:
+<pre><span class="p">$ </span>mkdir -p ~/.ssh &amp;&amp; echo "ssh-ed25519 AAAA… docksy" &gt;&gt; ~/.ssh/authorized_keys &amp;&amp; chmod 600 ~/.ssh/authorized_keys</pre>
+  Most VPS providers also let you paste the key when you create the machine.</li>
+  <li>Enter a name, the host (IP or DNS), the SSH port (default 22) and the user (default <code>root</code>; a passwordless-sudo user also works).</li>
+  <li><strong>Validate</strong> checks: SSH connects, root/sudo works, the OS, whether Docker is present, and free disk.</li>
+  <li><strong>Provision</strong> streams a live log while it sets the server up.</li>
+</ol>
+
+<h2 id="provision">What provisioning does</h2>
+<p>Provisioning is idempotent: run it again any time to repair or update a server.</p>
+<ul>
+  <li>Installs Docker (via <code>get.docker.com</code>) if it's missing.</li>
+  <li>Creates the <code>docksy</code> Docker network.</li>
+  <li>Starts <code>docksy-proxy</code> (Caddy with docker-proxy) on ports 80/443, with <strong>automatic HTTPS</strong> for every app domain.</li>
+  <li>Creates <code>/var/lib/docksy/{builds,backups,volumes}</code>.</li>
+  <li>Optionally opens 80/443 in <code>ufw</code>.</li>
+  <li>Installs the <strong>metrics agent</strong> (<code>/usr/local/bin/docksy-agent</code>, systemd unit <code>docksy-agent.service</code>, config in <code>/etc/docksy/agent.env</code>).</li>
+</ul>
+
+<h2 id="agent">The agent</h2>
+<p>The agent is a tiny static Go binary (no CGO, standard library only). Every 10 seconds it reports:</p>
+<ul>
+  <li>CPU (total and per core), load average, memory, swap, disks (real filesystems only) and network throughput</li>
+  <li>every container: state, CPU %, memory, network, and restart count</li>
+</ul>
+<p>It runs unprivileged except for read access to the Docker socket, and uses under 15 MB of RAM and under 1% CPU. It only <em>pushes</em> to your Docksy URL (<code>/api/agent/v1/report</code>) with its own token. No inbound port is opened. If Docksy is unreachable, it backs off and keeps only the latest report.</p>
+<p>A server is <strong>online</strong> when the agent reported in the last 60 seconds. After 2 minutes of silence the default <em>Server offline</em> alert fires.</p>
+
+<h2 id="detail">The server page</h2>
+<p><code>/servers/:id</code> is the showcase page:</p>
+<ul>
+  <li>live CPU, memory, disk and network gauges and charts</li>
+  <li>a per-core CPU heatmap and the load average</li>
+  <li>a containers table with per-container CPU and memory bars</li>
+  <li>a range picker: 15m, 1h, 6h, 24h, 7d or 30d</li>
+  <li>an <strong>Ask Claude to diagnose</strong> button that shows the diagnose report</li>
+</ul>
+
+<h2 id="layout">On-server layout</h2>
+<table>
+  <tr><th>Thing</th><th>Where / name</th></tr>
+  <tr><td>Network</td><td><code>docksy</code></td></tr>
+  <tr><td>Proxy</td><td>container <code>docksy-proxy</code> (ports 80/443)</td></tr>
+  <tr><td>App containers</td><td><code>dx-&lt;app&gt;-&lt;deploy8&gt;</code>, labels <code>docksy.managed=true</code>, <code>docksy.app</code>, <code>docksy.deployment</code></td></tr>
+  <tr><td>Builds / backups / volumes</td><td><code>/var/lib/docksy/…</code></td></tr>
+  <tr><td>Agent</td><td><code>/usr/local/bin/docksy-agent</code>, <code>docksy-agent.service</code>, <code>/etc/docksy/agent.env</code></td></tr>
+</table>
+
+<h2 id="remove">Remove a server</h2>
+<p>Docksy refuses to delete a server that still has apps. Delete or move the apps first. Deleting a server from Docksy doesn't wipe the machine. To remove the agent:</p>
+<pre><span class="p">$ </span>sudo systemctl disable --now docksy-agent &amp;&amp; sudo rm /usr/local/bin/docksy-agent /etc/systemd/system/docksy-agent.service /etc/docksy/agent.env</pre>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<table>
+  <tr><th>Symptom</th><th>Fix</th></tr>
+  <tr><td>SSH authentication failed</td><td>The key isn't in <code>authorized_keys</code> for that user, or the user/port is wrong.</td></tr>
+  <tr><td>Connection timed out</td><td>A firewall or security group is blocking port 22 from the Docksy host.</td></tr>
+  <tr><td>Agent never comes online</td><td>The Public URL in Settings must be reachable <em>from the server</em>. Check <code>journalctl -u docksy-agent</code>.</td></tr>
+  <tr><td>Ports 80/443 in use</td><td>Another web server is running. Stop it, or use a fresh machine.</td></tr>
+</table>
+<div class="callout ai"><p>With the Claude plugin, just say <em>"add my new Hetzner box 203.0.113.7 to Docksy"</em>. The <code>docksy-setup-server</code> skill walks you through it.</p></div>
+<nav class="pager"><a href="install.html"><small>← Previous</small>Install</a><a class="next" href="apps.html"><small>Next →</small>Apps &amp; deploys</a></nav>
+<p style="margin-top:2rem;font-size:13px;color:var(--muted)"><a href="https://github.com/osmanyousaaf/docksy/edit/main/docs/servers.html">Edit this page on GitHub</a></p>
+</main>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <span>Docksy: free forever, open source (Apache-2.0). No telemetry.</span>
+  <span><a href="https://github.com/osmanyousaaf/docksy">GitHub</a> · <a href="https://github.com/osmanyousaaf/docksy/issues">Issues</a> · <a href="https://github.com/osmanyousaaf/docksy/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sponsors/osmanyousaaf">Sponsor</a></span>
+</div></footer>
+</body>
+</html>

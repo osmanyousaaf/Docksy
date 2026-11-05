@@ -1,0 +1,22 @@
+{
+  "name": "@crovenai/docksy",
+  "version": "0.1.0",
+  "description": "Docksy CLI — deploy to your own servers from the terminal.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "docksy": "./dist/docksy.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/docksy.js --banner:js=\"#!/usr/bin/env node\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test --test-reporter=spec \"src/**/*.test.ts\""
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "picocolors": "^1.1.1"
+  }
+}

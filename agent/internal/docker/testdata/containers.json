@@ -1,0 +1,5 @@
+[
+  {"Id":"aaaaaaaaaaaa1111111111111111111111111111111111111111111111111111","Names":["/dx-web-1a2b3c4d"],"Image":"docksy/web:1a2b3c4d","ImageID":"sha256:x","Command":"node server.js","Created":1730000000,"State":"running","Status":"Up 3 hours (healthy)","Labels":{"docksy.managed":"true","docksy.app":"app_123","docksy.deployment":"dep_456"}},
+  {"Id":"bbbbbbbbbbbb2222222222222222222222222222222222222222222222222222","Names":["/old-job"],"Image":"busybox","Created":1730000000,"State":"exited","Status":"Exited (0) 2 days ago","Labels":null},
+  {"Id":"cccccccccccc3333333333333333333333333333333333333333333333333333","Names":["/flappy"],"Image":"redis:7","Created":1730000000,"State":"restarting","Status":"Restarting (1) 5 seconds ago","Labels":{}}
+]
