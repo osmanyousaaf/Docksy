@@ -18,6 +18,8 @@ Who it is for: a solo developer or a two-person team with one to five VPSes who 
 
 ## 2. Architecture
 
+![Architecture](images/diagrams/01-architecture.png)
+
 ```mermaid
 flowchart LR
   subgraph user["Your machine"]
@@ -77,6 +79,8 @@ flowchart LR
 | `coding plan for fable/` | This pack | team-lead |
 
 ## 3. Data model
+
+![Data model](images/diagrams/02-data-model.png)
 
 ```mermaid
 erDiagram
@@ -173,6 +177,8 @@ Conventions on every VPS: containers `dx-<app>-<deploy8>`, labels `docksy.manage
 
 ### 4.1 Add a server (S6)
 
+![Add a server](images/diagrams/03-add-server.png)
+
 ```mermaid
 sequenceDiagram
   participant U as User (S6 wizard)
@@ -192,6 +198,8 @@ sequenceDiagram
 ```
 
 ### 4.2 Deploy an app (S9 → S15)
+
+![Deploy an app](images/diagrams/04-deploy.png)
 
 ```mermaid
 flowchart TD
@@ -216,6 +224,8 @@ Rollback = run the previous deployment's image tag through the same path. Every 
 
 ### 4.3 An alert fires (S16)
 
+![An alert fires](images/diagrams/05-alert.png)
+
 ```mermaid
 flowchart LR
   AG[agent report] --> ST[store metrics]
@@ -239,6 +249,12 @@ Twenty-one screens, nine app-configuration sections, 66 checks. The full list wi
 
 Build order (also the phases below): **frame** (S1–S4) → **servers** (S5–S7) → **apps** (S8–S15) → **monitoring, settings, public** (S16–S21).
 
+How the screens connect:
+
+![Screen flow](images/diagrams/06-screen-flow.png)
+
+Every screen as it looks today, plus the logo and the diagrams: [04-DESIGN-IMAGES.md](04-DESIGN-IMAGES.md).
+
 What exists now, in the new grayscale style:
 
 | | |
@@ -253,6 +269,8 @@ What exists now, in the new grayscale style:
 Black `#0a0a0a` page, `#121212` panels, `#262626` borders, `#ededed` text, `#8f8f8f` muted. Color only for status: green running, yellow deploying, red failed. Inter 14 px. Coolify's page anatomy: breadcrumbs, page tabs, a left sub-nav for configuration, each section titled with its Save button beside it and a one-line description under it. Forms sit on the page, not in cards. No gradients, glows, shadows, blue, violet, light theme or animations. The full rules are in `apps/web/DESIGN.md` and at the end of [02-SCREENS.md](02-SCREENS.md).
 
 ## 7. Phases
+
+![Phases](images/diagrams/08-phases.png)
 
 | Phase | Screens | Exit criteria |
 |---|---|---|

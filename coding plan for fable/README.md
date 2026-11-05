@@ -7,8 +7,9 @@ This folder is the hand-over pack for building Docksy with Claude Code (model: C
 | [01-PLAN.md](01-PLAN.md) | The end-to-end plan: product, architecture diagrams, data model, how a deploy and an alert flow, the phases, the definition of done |
 | [02-SCREENS.md](02-SCREENS.md) | Every screen (S1–S21), every section, button, API call and check, in build order, plus the design rules and the issues/decisions log |
 | [03-TEAM.md](03-TEAM.md) | The seven agents, what each owns, how work is handed over, and the review loop |
+| [04-DESIGN-IMAGES.md](04-DESIGN-IMAGES.md) | All the pictures: 9 software diagrams as PNG, every screen of the new UI (desktop + phone), the logo, the banners |
 | [agents/](agents/) | Copies of the agent definitions. The live ones are in `../.claude/agents/` and Claude Code loads them from there |
-| [images/](images/) | Screenshots of what exists, the Coolify reference, the screen map, the logo sheets |
+| [images/](images/) | `diagrams/` (PNG flowcharts), `screens/desktop` and `screens/phone` (every screen), `logo/` (marks, lockups, icon, banners), the Coolify reference, the screen map |
 
 ## How to run the build (team lead)
 

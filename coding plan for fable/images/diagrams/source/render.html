@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<style>
+body{margin:0;background:#0a0a0a;color:#ededed;font-family:Inter,system-ui,sans-serif;padding:36px 40px}
+h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0 0 4px}
+p{color:#8f8f8f;margin:0 0 22px;font-size:14px}
+.mermaid{background:#0a0a0a}
+.foot{margin-top:18px;color:#5c5c5c;font-size:12px;display:flex;align-items:center;gap:8px}
+.foot svg{width:16px;height:16px;fill:#8f8f8f}
+</style></head><body>
+<h1 id="t"></h1><p id="s"></p>
+<pre class="mermaid" id="m"></pre>
+<div class="foot"><svg viewBox="0 0 64 64"><path fill-rule="evenodd" d="M12 10h22c12.15 0 22 9.85 22 22s-9.85 22-22 22H12V10zm9 9v26h13c7.18 0 13-5.82 13-13s-5.82-13-13-13H21z"/><rect x="21" y="26.5" width="26" height="3"/><rect x="21" y="34.5" width="26" height="3"/></svg>Docksy · coding plan for Fable · <span id="f"></span></div>
+<script>
+const q = new URLSearchParams(location.search);
+const name = q.get('d');
+const D = window.DIAGRAMS = {};
+</script>
+<script src="diagrams.js"></script>
+<script>
+const d = D[name];
+document.getElementById('t').textContent = d.title;
+document.getElementById('s').textContent = d.sub;
+document.getElementById('f').textContent = name + '.png';
+document.getElementById('m').textContent = d.code;
+mermaid.initialize({ startOnLoad: false, theme: 'base', fontFamily: 'Inter, system-ui, sans-serif',
+  themeVariables: { background: '#0a0a0a', primaryColor: '#121212', primaryTextColor: '#ededed', primaryBorderColor: '#3a3a3a', lineColor: '#8f8f8f',
+    secondaryColor: '#1a1a1a', tertiaryColor: '#161616', textColor: '#ededed', fontSize: '14px', edgeLabelBackground: '#0a0a0a', clusterBkg: '#0f0f0f', clusterBorder: '#262626',
+    actorBkg: '#121212', actorBorder: '#3a3a3a', actorTextColor: '#ededed', signalColor: '#ededed', signalTextColor: '#ededed', noteBkgColor: '#1a1a1a', noteTextColor: '#ededed', noteBorderColor: '#333',
+    attributeBackgroundColorOdd: '#121212', attributeBackgroundColorEven: '#161616', mainBkg: '#121212', nodeBorder: '#3a3a3a', titleColor: '#ededed' },
+  flowchart: { curve: 'basis', nodeSpacing: 36, rankSpacing: 48, padding: 12 }, sequence: { actorMargin: 60, width: 170, messageMargin: 44 }, er: { fontSize: 13 } });
+document.fonts.ready.then(() => mermaid.run({ nodes: [document.getElementById('m')] }).then(() => { document.body.dataset.done = '1'; }).catch((e) => { document.getElementById('s').textContent = 'RENDER ERROR: ' + e.message; }));
+</script>
+</body></html>
